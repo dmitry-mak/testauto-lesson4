@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+}
+
+group = 'ru.netology.autobasics'
+version = '1.0-SNAPSHOT'
+java {
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+}
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+//    testImplementation 'org.junit.jupiter:junit-jupiter:5.6.1'
+//    implementation 'org.seleniumhq.selenium:selenium-java:4.28.1'
+//    implementation 'io.github.bonigarcia:webdrivermanager:5.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.6.1'
+    testImplementation 'com.codeborne:selenide:6.17.2'
+}
+
+test {
+//    useJUnitPlatform()
+//    systemProperty 'chromeoptions.prefs',
+//            System.getProperty('chromeoptions.prefs', "profile.password_manager_leak_detection=false")
+    useJUnitPlatform()
+    // в тестах, вызывая `gradlew test -Dselenide.headless=true` будем передавать этот параметр в JVM (где его подтянет Selenide)
+    // свойство selenide.headless используется в проектах на основе Selenide для передачи значения параметра в JVM
+//    systemProperty 'selenide.headless', System.getProperty('selenide.headless')
+    // свойство chromeoptions.prefs используется для задания настроек браузера в проектах на основе Selenide, выключаем менеджер паролей
+    systemProperty 'chromeoptions.prefs', System.getProperty('chromeoptions.prefs', "profile.password_manager_leak_detection=false")
+}
+
+
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
