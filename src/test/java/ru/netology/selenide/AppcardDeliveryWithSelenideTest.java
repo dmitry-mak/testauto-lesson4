@@ -34,7 +34,7 @@ class AppcardDeliveryWithSelenideTest {
         $("[data-test-id='city'] input.input__control").setValue("Москва");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
         $("[data-test-id='date'] input.input__control").setValue(dateFormatter(3));
-        $("[data-test-id='name'] input.input__control").setValue("Пётр Козлов-Сидоров");
+        $("[data-test-id='name'] input.input__control").setValue("Николай Козлов-Сидоров");
         $("[data-test-id='phone'] input.input__control").setValue("+12345678901");
         $("[data-test-id='agreement'] .checkbox__box").click();
         $("button.button").click();
