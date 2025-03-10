@@ -2,6 +2,7 @@ package ru.netology.selenide;
 
 import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -18,11 +19,14 @@ import static com.codeborne.selenide.Selenide.open;
 
 class AppcardDeliveryWithSelenideTest {
 
+    @BeforeEach
+    public void setUp() {
+        open("http://localhost:9999");
+    }
 
     @Test
     public void shouldSendFormTest() {
-//        запускаем jar файл
-        open("http://localhost:9999");
+
 //        заполняем форму валидными данными
         $("[data-test-id='city'] input.input__control").setValue("Москва");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
@@ -42,8 +46,6 @@ class AppcardDeliveryWithSelenideTest {
     //    "Доставка в выбранный город недоступна"
     @Test
     public void shouldShowMessageForInvalidCityTest() {
-
-        open("http://localhost:9999");
 
         $("[data-test-id='city'] input.input__control").setValue("Балашиха");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
@@ -66,8 +68,6 @@ class AppcardDeliveryWithSelenideTest {
     @Test
     public void shouldShowMessageForLatinCityTest() {
 
-        open("http://localhost:9999");
-
         $("[data-test-id='city'] input.input__control").setValue("Spb");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
         $("[data-test-id='date'] input.input__control").setValue(dateFormatter(3));
@@ -89,9 +89,6 @@ class AppcardDeliveryWithSelenideTest {
     @Test
     public void shouldShowMessageForEmptyCityTest() {
 
-        open("http://localhost:9999");
-
-//        $("[data-test-id='city'] input.input__control").setValue("Spb");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
         $("[data-test-id='date'] input.input__control").setValue(dateFormatter(3));
         $("[data-test-id='name'] input.input__control").setValue("Владислав");
@@ -112,7 +109,6 @@ class AppcardDeliveryWithSelenideTest {
     @ParameterizedTest
     @CsvSource({"2", "3", "4"})
     public void shouldReserveForPlusThreeDaysTest(int daysInFuture) {
-        open("http://localhost:9999");
 
         $("[data-test-id='city'] input.input__control").setValue("Москва");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
@@ -145,8 +141,6 @@ class AppcardDeliveryWithSelenideTest {
     @Test
     public void shouldReserveForCorrectDateTest() {
 
-        open("http://localhost:9999");
-
         $("[data-test-id='city'] input.input__control").setValue("Москва");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
         $("[data-test-id='date'] input.input__control").setValue(dateFormatter(365));
@@ -167,7 +161,6 @@ class AppcardDeliveryWithSelenideTest {
     //    При попытке отправить форму с пустым полем "Дата встречи", должно появляться сообщение "Неверно введена дата"
     @Test
     public void shouldSendErrorNotificationForEmptyDateTest() {
-        open("http://localhost:9999");
 
         $("[data-test-id='city'] input.input__control").setValue("Москва");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
@@ -189,8 +182,6 @@ class AppcardDeliveryWithSelenideTest {
     @Test
     public void shouldAcceptSpecialCharacterInNameTest() {
 
-        open("http://localhost:9999");
-
         $("[data-test-id='city'] input.input__control").setValue("Москва");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
         $("[data-test-id='date'] input.input__control").setValue(dateFormatter(3));
@@ -206,12 +197,10 @@ class AppcardDeliveryWithSelenideTest {
     //    При попытке отправить форму с пустым полем "Фамилия и имя", должно появляться сообщение "Поле обязательно для заполнения"
     @Test
     public void shouldSendErrorNotificationForEmptyNameTest() {
-        open("http://localhost:9999");
 
         $("[data-test-id='city'] input.input__control").setValue("Москва");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
         $("[data-test-id='date'] input.input__control").setValue(dateFormatter(4));
-//        $("[data-test-id='name'] input.input__control").setValue("Владислав");
         $("[data-test-id='phone'] input.input__control").setValue("+12345678901");
         $("[data-test-id='agreement'] .checkbox__box").click();
         $("button.button").click();
@@ -226,7 +215,6 @@ class AppcardDeliveryWithSelenideTest {
     // Поле "Фамилия и имя" должно принимать буквы только кириллического алфавита
     @Test
     public void shouldSendErrorNotificationForLatinNameTest() {
-        open("http://localhost:9999");
 
         $("[data-test-id='city'] input.input__control").setValue("Москва");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
