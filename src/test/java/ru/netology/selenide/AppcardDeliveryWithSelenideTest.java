@@ -18,13 +18,6 @@ import static com.codeborne.selenide.Selenide.open;
 
 class AppcardDeliveryWithSelenideTest {
 
-    public String dateFormatter(int daysInFuture) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        LocalDate localDate = LocalDate.now();
-        LocalDate dateInFuture = localDate.plusDays(daysInFuture);
-        String formattedDate = dateInFuture.format(formatter);
-        return formattedDate;
-    }
 
     @Test
     public void shouldSendFormTest() {
@@ -34,7 +27,7 @@ class AppcardDeliveryWithSelenideTest {
         $("[data-test-id='city'] input.input__control").setValue("Москва");
         $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
         $("[data-test-id='date'] input.input__control").setValue(dateFormatter(3));
-        $("[data-test-id='name'] input.input__control").setValue("Николай Козлов-Сидоров");
+        $("[data-test-id='name'] input.input__control").setValue("Иван Петров-Сидоров");
         $("[data-test-id='phone'] input.input__control").setValue("+12345678901");
         $("[data-test-id='agreement'] .checkbox__box").click();
         $("button.button").click();
@@ -147,8 +140,8 @@ class AppcardDeliveryWithSelenideTest {
         }
     }
 
-//   При успешной отправке форму, дата в тексте уведомления должна совпадать с датой,
-//   введенной пользователем
+    //   При успешной отправке форму, дата в тексте уведомления должна совпадать с датой,
+    //   введенной пользователем
     @Test
     public void shouldReserveForCorrectDateTest() {
 
@@ -170,4 +163,129 @@ class AppcardDeliveryWithSelenideTest {
 
         Assertions.assertTrue(notificationBodyActualText.contains(dateInput));
     }
+
+    //    При попытке отправить форму с пустым полем "Дата встречи", должно появляться сообщение "Неверно введена дата"
+    @Test
+    public void shouldSendErrorNotificationForEmptyDateTest() {
+        open("http://localhost:9999");
+
+        $("[data-test-id='city'] input.input__control").setValue("Москва");
+        $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
+//        $("[data-test-id='date'] input.input__control").setValue(dateFormatter(365));
+        $("[data-test-id='name'] input.input__control").setValue("Владислав");
+        $("[data-test-id='phone'] input.input__control").setValue("+12345678901");
+        $("[data-test-id='agreement'] .checkbox__box").click();
+        $("button.button").click();
+
+        String controlPhrase = "Неверно введена дата";
+        WebElement notification = $("[data-test-id='date'] .input_invalid .input__sub");
+        String actualPhrase = notification.getText();
+
+        Assertions.assertTrue(actualPhrase.contains(controlPhrase));
+    }
+
+
+    //    Должен принимать букву "Ё" как валидный символ для поля "Имя"
+//    @Test
+//    public void shouldAcceptSpecialCharacterInNameTest() {
+//
+//        open("http://localhost:9999");
+//
+//        $("[data-test-id='city'] input.input__control").setValue("Москва");
+//        $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
+//        $("[data-test-id='date'] input.input__control").setValue(dateFormatter(3));
+//        $("[data-test-id='name'] input.input__control").setValue("Пётр");
+//        $("[data-test-id='phone'] input.input__control").setValue("+12345678901");
+//        $("[data-test-id='agreement'] .checkbox__box").click();
+//        $("button.button").click();
+//
+//        $("[data-test-id='notification']").shouldBe(Condition.visible, Duration.ofSeconds(15));
+//        Assertions.assertTrue($("[data-test-id='notification']").isDisplayed());
+//    }
+
+    //    При попытке отправить форму с пустым полем "Фамилия и имя", должно появляться сообщение "Поле обязательно для заполнения"
+    @Test
+    public void shouldSendErrorNotificationForEmptyNameTest() {
+        open("http://localhost:9999");
+
+        $("[data-test-id='city'] input.input__control").setValue("Москва");
+        $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input.input__control").setValue(dateFormatter(4));
+//        $("[data-test-id='name'] input.input__control").setValue("Владислав");
+        $("[data-test-id='phone'] input.input__control").setValue("+12345678901");
+        $("[data-test-id='agreement'] .checkbox__box").click();
+        $("button.button").click();
+
+        String controlPhrase = "Поле обязательно для заполнения";
+        WebElement notification = $("[data-test-id='name'].input_invalid .input__sub");
+        String actualPhrase = notification.getText();
+
+        Assertions.assertTrue(actualPhrase.contains(controlPhrase));
+    }
+
+    // Поле "Фамилия и имя" должно принимать буквы только кириллического алфавита
+    @Test
+    public void shouldSendErrorNotificationForLatinNameTest() {
+        open("http://localhost:9999");
+
+        $("[data-test-id='city'] input.input__control").setValue("Москва");
+        $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input.input__control").setValue(dateFormatter(4));
+        $("[data-test-id='name'] input.input__control").setValue("Vladisluff");
+        $("[data-test-id='phone'] input.input__control").setValue("+12345678901");
+        $("[data-test-id='agreement'] .checkbox__box").click();
+        $("button.button").click();
+
+        String controlPhrase = "Допустимы только русские буквы, пробелы и дефисы";
+        WebElement notification = $("[data-test-id='name'].input_invalid .input__sub");
+        String actualPhrase = notification.getText();
+
+        Assertions.assertTrue(actualPhrase.contains(controlPhrase));
+    }
+
+    // для номеров телефона короче или длиннее 11 символов должно появляться предупреждающее сообщение
+    @ParameterizedTest
+    @CsvSource({"+1234567890",
+            "+12345678901",
+            "+123456789012"})
+    public void shouldShowMessageForLongPhoneTest(String phoneNumber) {
+        open("http://localhost:9999");
+
+        $("[data-test-id='city'] input.input__control").setValue("Москва");
+        $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input.input__control").setValue(dateFormatter(4));
+        $("[data-test-id='name'] input.input__control").setValue("Владислав");
+        $("[data-test-id='phone'] input.input__control").setValue(phoneNumber);
+        $("[data-test-id='agreement'] .checkbox__box").click();
+        $("button.button").click();
+        if (phoneNumber.length() == 12) {
+            $("[data-test-id='notification']").shouldBe(Condition.visible, Duration.ofSeconds(15));
+            Assertions.assertTrue($("[data-test-id='notification']").isDisplayed());
+        } else {
+
+            Assertions.assertTrue(
+                    $("[data-test-id='phone'].input_invalid .input__sub").isDisplayed());
+
+            String controlPhrase = "Телефон указан неверно. Должно быть 11 цифр";
+            WebElement notification = $("[data-test-id='phone'].input_invalid .input__sub");
+            String actualPhrase = notification.getText();
+
+            Assertions.assertTrue(actualPhrase.contains(controlPhrase));
+        }
+    }
+
+    @Test
+    public void shouldShowMessageForLettersInPhoneTest() {
+    }
+
+    //    вспомогательный метод. Возвращает отформатированную дату.
+//    Параметр int daysInFuture - количество дней, удаленных от текущего
+    public String dateFormatter(int daysInFuture) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate localDate = LocalDate.now();
+        LocalDate dateInFuture = localDate.plusDays(daysInFuture);
+        String formattedDate = dateInFuture.format(formatter);
+        return formattedDate;
+    }
+
 }
