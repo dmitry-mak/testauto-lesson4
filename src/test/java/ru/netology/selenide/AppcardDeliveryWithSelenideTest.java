@@ -185,23 +185,23 @@ class AppcardDeliveryWithSelenideTest {
     }
 
 
-    //    Должен принимать букву "Ё" как валидный символ для поля "Имя"
-//    @Test
-//    public void shouldAcceptSpecialCharacterInNameTest() {
-//
-//        open("http://localhost:9999");
-//
-//        $("[data-test-id='city'] input.input__control").setValue("Москва");
-//        $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
-//        $("[data-test-id='date'] input.input__control").setValue(dateFormatter(3));
-//        $("[data-test-id='name'] input.input__control").setValue("Пётр");
-//        $("[data-test-id='phone'] input.input__control").setValue("+12345678901");
-//        $("[data-test-id='agreement'] .checkbox__box").click();
-//        $("button.button").click();
-//
-//        $("[data-test-id='notification']").shouldBe(Condition.visible, Duration.ofSeconds(15));
-//        Assertions.assertTrue($("[data-test-id='notification']").isDisplayed());
-//    }
+    //        Должен принимать букву "Ё" как валидный символ для поля "Имя"
+    @Test
+    public void shouldAcceptSpecialCharacterInNameTest() {
+
+        open("http://localhost:9999");
+
+        $("[data-test-id='city'] input.input__control").setValue("Москва");
+        $("[data-test-id='date'] input.input__control").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id='date'] input.input__control").setValue(dateFormatter(3));
+        $("[data-test-id='name'] input.input__control").setValue("Пётр");
+        $("[data-test-id='phone'] input.input__control").setValue("+12345678901");
+        $("[data-test-id='agreement'] .checkbox__box").click();
+        $("button.button").click();
+
+        $("[data-test-id='notification']").shouldBe(Condition.visible, Duration.ofSeconds(15));
+        Assertions.assertTrue($("[data-test-id='notification']").isDisplayed());
+    }
 
     //    При попытке отправить форму с пустым полем "Фамилия и имя", должно появляться сообщение "Поле обязательно для заполнения"
     @Test
